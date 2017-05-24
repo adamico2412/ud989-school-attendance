@@ -26,6 +26,17 @@ $(function(){
     };
     
     var octopus = {
+        incrementAbsences: function(studentName) {
+            var students = this.getStudents();
+            
+            for (var i = 0; i < students.length; ++i) {
+                if (students[i].name === studentName) {
+                    ++students[i].absences;
+                    break;
+                }
+            }
+            
+        },
         
         getStudents: function() {
             return model.students;
@@ -50,7 +61,9 @@ $(function(){
             this.$allMissed = $('tbody .missed-col');
             
             this.$allCheckboxes.on('click', function() {
-                view.countMissing();
+                var studentName = $(this).parent().prevAll('.name-col').html();
+                octopus.incrementAbsences(studentName);
+                view.updateMissedCol();
             });
             
         },
@@ -85,20 +98,13 @@ $(function(){
             this.tableBody.html(htmlString);
         },
         
-        countMissing: function() {
-            this.$allMissed.each(function() {
-                var studentRow = $(this).parent('tr'),
-                    dayChecks = $(studentRow).children('td').children('input'),
-                    numMissed = 0;
+        updateMissedCol: function() {
+            var students = octopus.getStudents();
+            var rows = jQuery.makeArray($('tbody').children('tr'));
 
-                dayChecks.each(function() {
-                    if (!$(this).prop('checked')) {
-                        numMissed++;
-                    }
-                });
-
-                $(this).text(numMissed);
-            });
+            for (var i = 0; i < students.length; ++i) {
+                $(rows[i]).children('.missed-col').html(students[i].absences);
+            }
         }
     };
     
